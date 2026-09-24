@@ -23,7 +23,8 @@ jobs:
       # does both.
       - name: Commit authorship
         run: |
-          allowed="sven.herzing@gmail.com"
+          authors="sven.herzing@gmail.com 15221068+gerfalcon@users.noreply.github.com"
+          committers="$authors noreply@github.com"   # GitHub commits its own merges as noreply
           # On a pull request HEAD is GitHub's synthetic merge commit, committed
           # as noreply@github.com; range to the branch tip instead.
           range="${{ github.event_name == 'pull_request'
@@ -31,13 +32,20 @@ jobs:
                      || format('{0}..{1}', github.event.before, github.sha) }}"
           # First push to a branch reports an all-zero "before"; check the tip.
           case "$range" in *0000000000000000000000000000000000000000*) range="HEAD~1..HEAD" ;; esac
-          bad=$(git log --format='%H %ae %ce' "$range" 2>/dev/null \
-                | awk -v ok="$allowed" '$2 != ok || $3 != ok')
+          # A merge GitHub made for a pull request (two parents, committed as
+          # noreply@github.com) is skipped: its parents were checked on the PR.
+          bad=$(git log --format='%H %ae %ce %P' "$range" 2>/dev/null \
+                | awk -v au="$authors" -v co="$committers" '
+                    BEGIN { n = split(au, a, " "); for (i = 1; i <= n; i++) A[a[i]] = 1
+                            n = split(co, c, " "); for (i = 1; i <= n; i++) C[c[i]] = 1 }
+                    $3 == "noreply@github.com" && NF >= 5 { next }
+                    !($2 in A) || !($3 in C)')
           if [ -n "$bad" ]; then
             echo "commits with an unapproved author or committer email:"
             echo "$bad"
             echo
-            echo "allowed: $allowed"
+            echo "allowed authors:    $authors"
+            echo "allowed committers: $committers"
             echo "if it looks like user@hostname, user.email was unset on that machine."
             echo "prevent it everywhere: git config --global user.useConfigOnly true"
             exit 1

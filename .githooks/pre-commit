@@ -13,7 +13,7 @@
 # not the guarantee. The guarantee is the CI check in .github/workflows/test.yml,
 # which runs on every push whatever machine produced the commit.
 
-allowed="sven.herzing@gmail.com"
+allowed="sven.herzing@gmail.com 15221068+gerfalcon@users.noreply.github.com"
 
 email=$(git var GIT_AUTHOR_IDENT | sed -n 's/.*<\(.*\)>.*/\1/p')
 
