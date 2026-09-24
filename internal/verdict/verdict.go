@@ -18,6 +18,7 @@ package verdict
 
 import (
 	"fmt"
+	"github.com/sherzing/assay/internal/model"
 	"go/ast"
 	"go/token"
 	"regexp"
@@ -226,4 +227,12 @@ func (c Config) Validate() []error {
 		}
 	}
 	return errs
+}
+
+// Apply stamps a verdict on a finding, so the scan and the importers cannot drift apart.
+func Apply(f *model.Finding, v V) {
+	f.Verdict, f.VerdictWhy, f.VerdictFrom = string(v.Verdict), v.Reason, v.Source
+	if !v.Until.IsZero() {
+		f.VerdictUntil = v.Until.Format("2006-01-02")
+	}
 }

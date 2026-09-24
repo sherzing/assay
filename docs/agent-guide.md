@@ -37,7 +37,8 @@ Ask the user these three things first. The answers change everything.
 | | path |
 |---|---|
 | Go | `ratchet scan` works natively. Start there. |
-| C#, Dart, TS, Python, anything | you need a SARIF producer first — see "Other languages" |
+| Dart / Flutter | DCM metrics via `ratchet import`; lint findings via `dart_code_linter` and a SARIF shim — see "Dart and Flutter" |
+| C#, TS, Python, anything | you need a SARIF producer first — see "Other languages" |
 
 **2. What do they actually want?**
 
@@ -154,7 +155,29 @@ SARIF 2.1 rather than 1.0. Without it the import will be wrong.
 Do **not** set `TreatWarningsAsErrors` as well. The ratchet is the gate; two
 gates fighting each other is how people end up disabling both.
 
-### Dart
+### Dart and Flutter
+
+Two tools, two jobs. For metrics, use [DCM](https://dcm.dev): commercial, the
+CI key is a Teams feature, and it does not resolve dependencies, so `pub get`
+comes first.
+
+```sh
+dcm init metrics-preview --format=analysis_options lib   # once: prints a dcm: metrics: block for analysis_options.yaml
+flutter pub get
+dcm run --metrics --report-all --no-fatal-found --reporter=json --output-to=dcm.json lib
+ratchet import dcm.json --emit measures --repo myapp | strata append
+lens top --store .assay --metric cyclomatic --n 10
+```
+
+DCM measures only what `analysis_options.yaml` configures: without the `dcm:
+metrics:` block the report is empty, and the import fails rather than storing
+zeros. `ratchet import` reads DCM's JSON directly; there is no converter to
+own. Say `--report-all` out loud, or the metrics are only the breaches, and
+`--no-fatal-found`, or DCM fails the build before ratchet gets a say. Lint
+findings are not imported yet, so a DCM-only gate is `--mode check
+--strict-caps`, which holds peak complexity.
+
+For lint findings and the gate, the open-source `dart_code_linter` still works:
 
 ```yaml
 # pubspec.yaml

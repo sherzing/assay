@@ -82,7 +82,7 @@ layer verdicts    internal/verdict
 layer history     internal/store internal/evidence
 layer gate        internal/baseline
 layer tickets     internal/docket
-layer import      internal/sarif
+layer import      internal/sarif internal/dcm
 layer presenting  internal/report
 
 # The schema depends on nothing.
@@ -152,3 +152,7 @@ The tools-do-not-import-each-other rule is not expressible here: `plumb`
 covers package dependencies, and `cmd/*` are separate mains that the import
 graph already keeps apart. It is checked by the fact that each binary builds
 alone. If that ever stops being true, add a layer per command.
+
+**2026-09-23.** `internal/dcm` joins `import` beside `internal/sarif`: a second
+importer, for DCM's JSON on Dart and Flutter code. Widening a layer is a
+tightening, so this needed no second reviewer.

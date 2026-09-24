@@ -28,7 +28,7 @@ Composability comes from a shared data format, not from good module boundaries.
 | record | what it says |
 |---|---|
 | `finding` | something is wrong at this location |
-| `measure` | this number, this commit, this scope (project/module/file/function) |
+| `measure` | this number, this commit, this scope (project/module/file/function/class) |
 | `verdict` | a human judged this finding |
 | `ticket` | this cohort of findings is tracked as one issue |
 
@@ -41,7 +41,7 @@ renamed without breaking a build.
 
 | | |
 |---|---|
-| **`ratchet`** | the gate. `scan`, `baseline`, `check`, `import` (SARIF from any linter), `history`, `exceptions`, `learn` |
+| **`ratchet`** | the gate. `scan`, `baseline`, `check`, `import` (SARIF from any linter, DCM metrics for Dart), `history`, `exceptions`, `learn` |
 | **`strata`** | append-only history. `append`, `query`, `rollup`, `verdicts`, `stat`, `precision`, `export`, `verify`, `promote-check` |
 | **`lens`** | read a stream at a glance. `top`, `trend`, `diff`, `compare`, `calibrate` |
 | **`docket`** | turn findings into tickets. `plan`, `create`, `sync`, `status` |

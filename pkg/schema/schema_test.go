@@ -339,3 +339,15 @@ func TestTimestampsSerialiseAsRFC3339UTC(t *testing.T) {
 		t.Errorf("timestamp shifted across the wire: got %v, want %v", got[0].Measure.TS, ts(t))
 	}
 }
+
+// The scopes are part of the contract: a consumer in another language switches on them, so a
+// new one is a recorded decision, not a comment.
+func TestScopesArePinned(t *testing.T) {
+	want := []Scope{"project", "module", "file", "function", "class"}
+	got := []Scope{ScopeProject, ScopeModule, ScopeFile, ScopeFunction, ScopeClass}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("scope %d = %q, want %q", i, got[i], want[i])
+		}
+	}
+}

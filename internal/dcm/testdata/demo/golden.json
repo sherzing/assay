@@ -1,0 +1,1320 @@
+{
+ "FormatVersion": 13,
+ "Measures": [
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/pricing.dart",
+   "metric": "imports.external",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/pricing.dart",
+   "metric": "imports",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/pricing.dart:TaxTable",
+   "metric": "methods",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "cyclomatic",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "halstead.volume",
+   "value": 104
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "loc",
+   "value": 6
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "nesting",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "sloc",
+   "value": 4
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/pricing.dart:applyTaxTo",
+   "metric": "maintainability",
+   "value": 0.773
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/legacy_helpers.dart",
+   "metric": "imports.external",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/legacy_helpers.dart",
+   "metric": "imports",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "halstead.volume",
+   "value": 11.61
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "sloc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/legacy_helpers.dart:legacyRound",
+   "metric": "maintainability",
+   "value": 0.924
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/cart.dart",
+   "metric": "imports.external",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/cart.dart",
+   "metric": "imports",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/cart.dart:Cart",
+   "metric": "methods",
+   "value": 7
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/cart.dart:Cart",
+   "metric": "weight",
+   "value": 0.545
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "cyclomatic",
+   "value": 5
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "halstead.volume",
+   "value": 261.343
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "loc",
+   "value": 16
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "nesting",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "params",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "sloc",
+   "value": 14
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.total",
+   "metric": "maintainability",
+   "value": 0.667
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "halstead.volume",
+   "value": 27
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "loc",
+   "value": 4
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "sloc",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.discounted",
+   "metric": "maintainability",
+   "value": 0.857
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "halstead.volume",
+   "value": 58.81
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "loc",
+   "value": 4
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "sloc",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.addAll",
+   "metric": "maintainability",
+   "value": 0.833
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.clear",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.clear",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "halstead.volume",
+   "value": 77.709
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "loc",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "sloc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.shout",
+   "metric": "maintainability",
+   "value": 0.866
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "cyclomatic",
+   "value": 5
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "halstead.volume",
+   "value": 261.343
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "loc",
+   "value": 16
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "nesting",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "params",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "sloc",
+   "value": 14
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.copyTotal",
+   "metric": "maintainability",
+   "value": 0.667
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "halstead.volume",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "sloc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/cart.dart:Cart.neverCalled",
+   "metric": "maintainability",
+   "value": 0.978
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/box.dart",
+   "metric": "imports.external",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "file",
+   "path": "lib/box.dart",
+   "metric": "imports",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/box.dart:Box",
+   "metric": "methods",
+   "value": 7
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/box.dart:Box",
+   "metric": "weight",
+   "value": 0.25
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "class",
+   "path": "lib/box.dart:Unnamed",
+   "metric": "methods",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.Box",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.named",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.fallback",
+   "metric": "cyclomatic",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.fallback",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "cyclomatic",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "halstead.volume",
+   "value": 18.095
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "sloc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value",
+   "metric": "maintainability",
+   "value": 0.909
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "cyclomatic",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "halstead.volume",
+   "value": 68.114
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "loc",
+   "value": 7
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "nesting",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "sloc",
+   "value": 5
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.value=",
+   "metric": "maintainability",
+   "value": 0.773
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "cyclomatic",
+   "value": 3
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "halstead.volume",
+   "value": 212.607
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "loc",
+   "value": 11
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "nesting",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "sloc",
+   "value": 9
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work",
+   "metric": "maintainability",
+   "value": 0.702
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.clear",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.clear",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "cyclomatic",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "halstead.volume",
+   "value": 8
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "loc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "params",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "sloc",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Unnamed.triple",
+   "metric": "maintainability",
+   "value": 0.935
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "cyclomatic",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "halstead.volume",
+   "value": 46.507
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "loc",
+   "value": 4
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "nesting",
+   "value": 0
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "params",
+   "value": 1
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "sloc",
+   "value": 2
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.work.inner",
+   "metric": "maintainability",
+   "value": 0.839
+  },
+  {
+   "v": 0,
+   "kind": "",
+   "repo": "",
+   "ts": "0001-01-01T00:00:00Z",
+   "scope": "function",
+   "path": "lib/box.dart:Box.fallback",
+   "metric": "nesting",
+   "value": 0
+  }
+ ],
+ "Functions": [
+  {
+   "name": "Box.fallback",
+   "file": "lib/box.dart",
+   "line": 4,
+   "exported": true,
+   "cyclomatic": 2,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 0,
+   "results": 0
+  },
+  {
+   "name": "Box.value",
+   "file": "lib/box.dart",
+   "line": 7,
+   "exported": true,
+   "cyclomatic": 2,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 0,
+   "results": 0
+  },
+  {
+   "name": "Box.value=",
+   "file": "lib/box.dart",
+   "line": 8,
+   "exported": true,
+   "cyclomatic": 2,
+   "cognitive": 0,
+   "maxNesting": 1,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "Box.work",
+   "file": "lib/box.dart",
+   "line": 16,
+   "exported": true,
+   "cyclomatic": 3,
+   "cognitive": 0,
+   "maxNesting": 1,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "Box.work.inner",
+   "file": "lib/box.dart",
+   "line": 17,
+   "exported": true,
+   "cyclomatic": 2,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "Unnamed.triple",
+   "file": "lib/box.dart",
+   "line": 32,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 0,
+   "results": 0
+  },
+  {
+   "name": "Cart.total",
+   "file": "lib/cart.dart",
+   "line": 14,
+   "exported": true,
+   "cyclomatic": 5,
+   "cognitive": 0,
+   "maxNesting": 3,
+   "statements": 0,
+   "params": 3,
+   "results": 0
+  },
+  {
+   "name": "Cart.discounted",
+   "file": "lib/cart.dart",
+   "line": 31,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "Cart.addAll",
+   "file": "lib/cart.dart",
+   "line": 36,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "Cart.shout",
+   "file": "lib/cart.dart",
+   "line": 43,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 0,
+   "results": 0
+  },
+  {
+   "name": "Cart.copyTotal",
+   "file": "lib/cart.dart",
+   "line": 47,
+   "exported": true,
+   "cyclomatic": 5,
+   "cognitive": 0,
+   "maxNesting": 3,
+   "statements": 0,
+   "params": 3,
+   "results": 0
+  },
+  {
+   "name": "Cart.neverCalled",
+   "file": "lib/cart.dart",
+   "line": 64,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 0,
+   "results": 0
+  },
+  {
+   "name": "legacyRound",
+   "file": "lib/legacy_helpers.dart",
+   "line": 2,
+   "exported": true,
+   "cyclomatic": 1,
+   "cognitive": 0,
+   "maxNesting": 0,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  },
+  {
+   "name": "applyTaxTo",
+   "file": "lib/pricing.dart",
+   "line": 1,
+   "exported": true,
+   "cyclomatic": 2,
+   "cognitive": 0,
+   "maxNesting": 1,
+   "statements": 0,
+   "params": 1,
+   "results": 0
+  }
+ ],
+ "Files": 4,
+ "Funcs": 14,
+ "Generated": 3,
+ "Located": 5,
+ "Issues": 67
+}

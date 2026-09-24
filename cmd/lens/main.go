@@ -110,7 +110,7 @@ func inputFlags(fs *flag.FlagSet) (*string, *string, *string, *string) {
 	return fs.String("store", "", "read a strata store instead of stdin"),
 		fs.String("repo", "", "filter by repo"),
 		fs.String("metric", "", "filter by metric"),
-		fs.String("scope", "", "project|module|file|function")
+		fs.String("scope", "", "project|module|file|function|class")
 }
 
 func filter(ms []schema.Measure, repo, metric, scope string) []schema.Measure {
@@ -650,6 +650,8 @@ func langOf(path string) string {
 	switch {
 	case strings.Contains(path, ".go:"), strings.HasSuffix(path, ".go"):
 		return "go"
+	case strings.Contains(path, ".dart:"), strings.HasSuffix(path, ".dart"):
+		return "dart"
 	}
 	return ""
 }

@@ -46,6 +46,7 @@ const (
 	ScopeModule   Scope = "module"
 	ScopeFile     Scope = "file"
 	ScopeFunction Scope = "function"
+	ScopeClass    Scope = "class" // a class, mixin, extension or enum; written by importers, never by the Go scan
 )
 
 // Severity ranks a finding.

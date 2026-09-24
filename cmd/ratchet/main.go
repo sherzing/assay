@@ -25,7 +25,6 @@ import (
 	"github.com/sherzing/assay/internal/learn"
 	"github.com/sherzing/assay/internal/model"
 	"github.com/sherzing/assay/internal/report"
-	"github.com/sherzing/assay/internal/sarif"
 	"github.com/sherzing/assay/internal/verdict"
 	"github.com/sherzing/assay/pkg/schema"
 )
@@ -80,7 +79,7 @@ usage:
   ratchet baseline [flags] [path]   record current state as tolerated
   ratchet check    [flags] [path]   exit non-zero only on regression
   ratchet history  [flags] [path]   metric series over git history
-  ratchet import   [flags] <file>   ingest SARIF from any linter, then baseline/check
+  ratchet import   [flags] <file>   ingest SARIF from any linter or DCM JSON for Dart, then baseline/check
   ratchet exceptions [path]         everything currently tolerated, and why
   ratchet learn <repo>...           derive candidate rules from codebases you trust
   ratchet rules                     list rules
@@ -196,20 +195,8 @@ func cmdScan(args []string) error {
 		if name == "" {
 			name = filepath.Base(mustAbs(root))
 		}
-		orgName := verdict.ResolveOrg(*org, opt.Config.Org, gitEmail(root))
-		// Say so when the org was inferred rather than stated. Evidence gets
-		// tagged with this, and silently attributing someone's work to whatever
-		// happens to be in their global git config is a surprise nobody wants
-		// to discover after publishing.
-		if orgName != "" && *org == "" && opt.Config.Org == "" {
-			fmt.Fprintf(os.Stderr,
-				"note: attributing evidence to org %q, inferred from git email. "+
-					"Use --org or set org: in .quality.yaml to be explicit, or --org=- for none.\n", orgName)
-		}
-		if *org == "-" {
-			orgName = ""
-		}
-		if err := emitAssay(rep, *emit, name, gitCommit(root), orgName, !*noVerdicts); err != nil {
+		orgName := resolveOrg(*org, opt.Config.Org, root)
+		if err := emitAssay(rep, *emit, name, gitCommit(root), orgName, !*noVerdicts, time.Now().UTC(), nativeTool); err != nil {
 			return err
 		}
 	} else if err := emitReport(rep, c); err != nil {
@@ -229,20 +216,33 @@ func mustAbs(p string) string {
 	return a
 }
 
+// resolveOrg picks the organisation evidence is attributed to, and says so when inferred. "-" means none.
+func resolveOrg(flagVal, cfgOrg, root string) string {
+	if flagVal == "-" {
+		return ""
+	}
+	name := verdict.ResolveOrg(flagVal, cfgOrg, gitEmail(root))
+	if name != "" && flagVal == "" && cfgOrg == "" {
+		fmt.Fprintf(os.Stderr,
+			"note: attributing evidence to org %q, inferred from git email. "+
+				"Use --org or set org: in .quality.yaml to be explicit, or --org=- for none.\n", name)
+	}
+	return name
+}
+
 // emitAssay writes assay JSONL records so ratchet composes with strata.
 //
 // Split into per-kind helpers after assay flagged this at cognitive 28 — second
 // worst in its own codebase, and freshly written. Dogfooding works.
-func emitAssay(rep *model.Report, kind, repo, commit, org string, withVerdicts bool) error {
+func emitAssay(rep *model.Report, kind, repo, commit, org string, withVerdicts bool, now time.Time, toolOf func(model.Finding) string) error {
 	enc := schema.NewEncoder(os.Stdout)
 	defer enc.Flush()
-	now := time.Now().UTC()
 
 	switch kind {
 	case "measures":
 		return emitMeasures(enc, rep, repo, commit, now)
 	case "findings":
-		if err := emitFindings(enc, rep, repo, commit, now); err != nil {
+		if err := emitFindings(enc, rep, repo, commit, now, toolOf); err != nil {
 			return err
 		}
 		// Verdicts are emitted BY DEFAULT. A judgement that only lives in a
@@ -313,10 +313,13 @@ func emitMeasures(enc *schema.Encoder, rep *model.Report, repo, commit string, n
 	return nil
 }
 
-func emitFindings(enc *schema.Encoder, rep *model.Report, repo, commit string, now time.Time) error {
+// nativeTool names the producer of a scan's own findings.
+func nativeTool(model.Finding) string { return "ratchet" }
+
+func emitFindings(enc *schema.Encoder, rep *model.Report, repo, commit string, now time.Time, toolOf func(model.Finding) string) error {
 	for _, f := range rep.Findings {
 		if err := enc.Write(&schema.Finding{
-			Repo: repo, Commit: commit, TS: now, Tool: "ratchet",
+			Repo: repo, Commit: commit, TS: now, Tool: toolOf(f),
 			Rule: f.Rule, Severity: schema.Severity(f.Severity),
 			File: f.File, Line: f.Line, Col: f.Col, Symbol: f.Func,
 			Message: f.Message, Suggest: f.Suggest, Fingerprint: f.Fingerprint,
@@ -732,116 +735,6 @@ func cmdRules() {
 		r := analyze.Rules[id]
 		fmt.Printf("%-28s [%s]\n  %s\n\n", id, r.Severity, r.Doc)
 	}
-}
-
-// cmdImport ingests SARIF so the ratchet works on languages ratchet cannot parse.
-//
-// The point is reuse, not coverage: golangci-lint, Roslyn analyzers, semgrep,
-// CodeQL and dart analyze all emit SARIF already. Consuming it is strictly
-// better than writing a Dart parser and a C# parser and owning both forever.
-func cmdImport(args []string) error {
-	fs := flag.NewFlagSet("import", flag.ExitOnError)
-	root := fs.String("root", ".", "repository root, for making absolute SARIF paths relative")
-	tool := fs.String("tool", "", "override the tool name used to namespace rule IDs")
-	baselineFile := fs.String("file", defaultBaselineFile, "baseline path")
-	mode := fs.String("mode", "report", "report | baseline | check")
-	includeSuppressed := fs.Bool("include-suppressed", false, "import results the producer marked suppressed")
-	force := fs.Bool("force", false, "overwrite an existing baseline (mode=baseline)")
-	asJSON := fs.Bool("json", false, "emit JSON")
-	srcs := parseArgsMulti(fs, args)
-	if len(srcs) == 0 {
-		return fmt.Errorf("usage: ratchet import [flags] <file.sarif>...\n" +
-			"  several files are merged, which is what a multi-project build produces:\n" +
-			"    ratchet import artifacts/*.sarif --mode baseline\n" +
-			"  pipe with: golangci-lint run --out-format sarif | ratchet import -")
-	}
-
-	// MERGE, do not take the first. A .NET solution writes one SARIF per
-	// project — a single shared ErrorLog path would have each project
-	// overwrite the last — so importing one file at a time is how you end up
-	// with a baseline covering a tenth of the codebase and a green check.
-	var (
-		findings []model.Finding
-		err      error
-	)
-	opt := sarif.Options{Root: *root, ToolPrefix: *tool, IncludeSuppressed: *includeSuppressed}
-	for _, src := range srcs {
-		var batch []model.Finding
-		if src == "-" {
-			batch, err = sarif.Import(os.Stdin, opt)
-		} else {
-			batch, err = sarif.ImportFile(src, opt)
-		}
-		if err != nil {
-			return fmt.Errorf("%s: %w", src, err)
-		}
-		findings = append(findings, batch...)
-	}
-	if len(srcs) > 1 {
-		fmt.Fprintf(os.Stderr, "merged %d SARIF files\n", len(srcs))
-	}
-	if err != nil {
-		return err
-	}
-
-	rep := &model.Report{Root: *root, Findings: findings}
-	rep.Summarise(0) // file count is unknown from SARIF alone
-	rep.Commit = gitCommit(*root)
-
-	path := *baselineFile
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(*root, path)
-	}
-
-	switch *mode {
-	case "report":
-		if *asJSON {
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "  ")
-			return enc.Encode(rep)
-		}
-		fmt.Printf("imported %d findings\n", len(findings))
-		byRule := rep.Summary.FindingsByRule
-		keys := make([]string, 0, len(byRule))
-		for k := range byRule {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			fmt.Printf("  %-52s %d\n", k, byRule[k])
-		}
-		return nil
-
-	case "baseline":
-		if _, err := os.Stat(path); err == nil && !*force {
-			return fmt.Errorf("baseline already exists at %s\n"+
-				"  regenerating it would silently forgive every current violation.\n"+
-				"  use --force to overwrite", path)
-		}
-		b := baseline.From(rep, rep.Commit)
-		if err := b.Save(path); err != nil {
-			return err
-		}
-		fmt.Printf("wrote %s with %d tolerated findings\n", path, len(b.Tolerated))
-		return nil
-
-	case "check":
-		b, err := baseline.Load(path)
-		if err != nil {
-			return fmt.Errorf("%w\n  run `ratchet import --mode baseline` first", err)
-		}
-		res := b.Check(rep, false)
-		fmt.Printf("%d tolerated, %d new, %d fixed\n", res.Existing, len(res.New), len(res.Fixed))
-		if len(res.New) > 0 {
-			fmt.Printf("\nNEW findings (these fail the build):\n")
-			report.Findings(os.Stdout, res.New)
-		}
-		if res.Regressed() {
-			os.Exit(1)
-		}
-		return nil
-	}
-	return fmt.Errorf("unknown mode %q (want report|baseline|check)", *mode)
 }
 
 // cmdExceptions lists everything currently tolerated.

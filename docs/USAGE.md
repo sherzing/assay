@@ -105,8 +105,14 @@ golangci-lint run --out-format sarif | ratchet import - --mode check
 dotnet build --no-incremental -p:AnalysisMode=All
 ratchet import artifacts/*.sarif --root . --mode baseline
 
-# Dart
+# Dart — dart_code_linter (open source): its JSON needs a small shim to SARIF
 dart_code_linter analyze lib --reporter=json | your-shim | ratchet import -
+
+# Dart / Flutter — DCM (commercial): ratchet reads its metrics directly. DCM measures only
+# what analysis_options.yaml configures, so add a dcm: metrics: block first
+# (dcm init metrics-preview --format=analysis_options lib prints one) and run pub get
+dcm run --metrics --report-all --no-fatal-found --reporter=json --output-to=dcm.json lib
+ratchet import dcm.json --emit measures --repo myapp | strata append
 
 # Anything semgrep covers
 semgrep --config rules/ --sarif | ratchet import - --mode check
@@ -120,6 +126,14 @@ Three behaviours worth knowing:
   told no gets switched off entirely.
 - **Fingerprints exclude line numbers.** A reformat must not read as a wave of
   new violations. The producer's own `partialFingerprints` are used when present.
+- **Imported findings are first-class.** `.quality.yaml` verdicts apply to them,
+  and `ratchet import … --emit findings|measures` writes the same records a scan
+  does, so they reach `strata` and `docket`. `--repo`, `--commit` and `--ts`
+  stamp the records; `--ts` lets a history backfill land on its commit's day.
+  Findings carry `tool: sarif/<driver>`, and the counts are named per producer,
+  `findings.<driver>.total`, so they never overwrite the scan's own
+  `findings.total`; a clean run records its zero for every driver the document
+  names. As with `scan`, an invalid `.quality.yaml` fails the import.
 
 ---
 
@@ -397,6 +411,7 @@ same module — those are cohesion, not shotgun surgery.
 | many | `lizard` | MIT |
 | Python | `wily` (per-commit history built in) | Apache-2.0 |
 | Dart | `dart_code_linter` | MIT |
+| Dart / Flutter | DCM, read natively by `ratchet import` | commercial, free tier |
 | C# | Roslyn analyzers via `ErrorLog=*.sarif%2cversion=2.1` | MIT |
 
 ### Duplication
@@ -599,7 +614,7 @@ golangci-lint run --out-format sarif | ratchet import - --mode check
 
 Use alongside `ratchet scan`, not instead of it — different rules, no overlap.
 
-### Dart
+### Dart — dart_code_linter
 
 ```yaml
 dev_dependencies:
@@ -612,6 +627,105 @@ dart run dart_code_linter:metrics analyze lib --reporter=json > dcl.json
 
 No SARIF reporter, so you own a small converter (~40 lines mapping
 `records[].issues[]` to SARIF `results[]`). Add `lakos` for cycle detection.
+
+### Dart and Flutter — DCM
+
+[DCM](https://dcm.dev) is the commercial successor of the tool above, and its
+metrics are the reason to run it: cyclomatic complexity, nesting, widget nesting
+and widgets per build method, class cohesion and coupling. It has no SARIF
+reporter, and SARIF would drop the metrics anyway, so `ratchet import` reads
+DCM's own JSON. The format is sniffed from the document; `--format dcm` forces
+it.
+
+DCM measures only what `analysis_options.yaml` configures. With no `dcm:
+metrics:` block, `metricResults` is empty and the import fails rather than
+storing zeros, so the block comes first. Let DCM write it from what it sees in
+your code, or start from a few metrics:
+
+```sh
+dcm init metrics-preview --format=analysis_options lib   # prints every metric, with thresholds
+```
+
+```yaml
+# analysis_options.yaml
+dcm:
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+    source-lines-of-code: 50
+```
+
+```sh
+flutter pub get   # DCM does not resolve dependencies itself
+dcm run --metrics --report-all --no-fatal-found --reporter=json --output-to=dcm.json lib
+ratchet import dcm.json --emit measures --repo myapp | strata append
+lens top --store .assay --metric cyclomatic --n 10
+lens calibrate --store .assay --lang dart      # bands from your own corpus; pasted under dart:, they apply to .dart paths
+```
+
+`--report-all` makes DCM report every metric value rather than only threshold
+breaches; without it the distributions are meaningless. `--no-fatal-found`
+stops DCM failing the build by itself. Without `pub get` the syntactic metrics
+are still right, but widget metrics disappear rather than read zero and
+`depth-of-inheritance-tree` resets at every `package:` import, and nothing
+downstream can tell that from a genuine zero.
+
+**What each DCM plan gives you.** DCM is commercial, and the plan decides
+which `dcm run` flags produce anything. The importer does not care: a section
+your plan does not emit simply imports nothing. As of late 2026, per
+[dcm.dev/pricing](https://dcm.dev/pricing/):
+
+| plan | what it adds for this pipeline |
+|---|---|
+| Free — one seat, no account or card | `--metrics` with 22 metrics, capped at 50k analysed lines; `--analyze` with a fixed set of ~100 rules; `--unused-files`. No rule configuration, no presets, no CI key. |
+| Pro — per seat | the full rule set with configuration and presets, `--unused-code`, `--code-duplication`, widgets and assets analysis |
+| Teams and up | unlimited lines, dashboards, and the `--ci-key` that running in CI requires |
+
+Two operational details that cost us an afternoon: the Free plan still needs
+`dcm activate --license-key=…`, and an expired paid licence left on a machine
+blocks every command, free ones included, until another key is activated.
+
+**What lands in the store.** Measures use the Go scan's names, `cyclomatic`,
+`nesting`, `params`, `sloc`, plus DCM's own such as `widgets.nesting` and
+`cohesion`, at function, file and `class` scope, where a class is any class,
+mixin, extension or enum. `ratchet` derives the project series, `cyclomatic.p90`
+and the rest, the way it does for a scan, so one `lens trend` query serves a
+Dart repo and a Go repo alike. Declarations keep the names DCM gives them, with
+the collisions resolved: a setter is `Box.value=`, a local function is
+`Box.work.inner`, an unnamed extension's method is `Unnamed.triple`. The
+declarations DCM computed cyclomatic complexity for also fill the per-function
+records, so `ratchet import dcm.json --json` reads like a native scan and
+`--mode check --strict-caps` holds peak cyclomatic complexity and nesting; a
+bodiless declaration has no complexity and gets no record. Cognitive complexity
+stays 0: DCM has no such metric. Generated code is skipped, as the Go scan
+skips it: `.g.dart`, `.freezed.dart`, `.pb.dart` and friends, `generated/`
+directories, and any file whose header says a tool wrote it.
+
+Three things to know before trusting a number:
+
+- `maintainability`, `cohesion` and `weight` are higher-is-better. `lens` ranks
+  and judges every metric as higher-is-worse, so on these `lens top` lists the
+  best code first and a falling trend reads as improving.
+- DCM writes paths relative to the directory it ran in. Run it from the
+  repository root, or import every package's report in one invocation as
+  `report=prefix` pairs, `ratchet import packages/app/dcm.json=packages/app
+  packages/lib/dcm.json=packages/lib --root .`, so the declarations key like the
+  rest of the repository and the project series is rolled up once; `--prefix`
+  is the default for a report without one. Two imports under one `--repo` would
+  each write their own series. Two reports disagreeing about one declaration is
+  an error, not a second value, and an import none of whose files is under
+  `--root` says so: that is the forgotten prefix.
+- Lint findings (`--analyze`, unused code, duplication) are not imported yet;
+  the import says how many it skipped. `--mode check` on DCM input needs
+  `--strict-caps`, because nothing else could fail.
+
+Backfilling history costs a `pub get` per sampled commit: sample monthly, and
+pass `--ts` and `--commit` so each sample lands on its own day in the store.
+Backfill with `--detail=false`, which keeps the project series and drops the
+per-declaration rows, as `ratchet history` does: a store full of functions that
+no longer exist misleads `lens top` and `lens diff`. `lakos` still covers cycle
+detection.
 
 ### Anything else
 

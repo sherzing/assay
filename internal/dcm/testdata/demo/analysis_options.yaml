@@ -1,0 +1,23 @@
+dcm:
+  rules:
+    - avoid-dynamic
+    - avoid-ignoring-return-values
+    - avoid-non-null-assertion
+    - avoid-unused-parameters
+    - no-empty-block
+    - no-magic-number
+    - prefer-match-file-name
+    - prefer-immediate-return
+    - avoid-global-state
+  metrics:
+    cyclomatic-complexity: 4
+    maximum-nesting-level: 2
+    source-lines-of-code: 8
+    number-of-parameters: 2
+    halstead-volume: 80
+    maintainability-index: 60
+    lines-of-code: 12
+    weight-of-class: 0.5
+    number-of-methods: 3
+    number-of-imports: 1
+    number-of-external-imports: 1

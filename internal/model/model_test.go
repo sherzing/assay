@@ -205,3 +205,21 @@ func TestSummariseOnAnEmptyReport(t *testing.T) {
 		t.Errorf("Cyclomatic = %+v, want the zero value", r.Summary.Cyclomatic)
 	}
 }
+
+func TestFloatDistMatchesDistOnIntegers(t *testing.T) {
+	ints := []int{7, 1, 4, 9, 2, 8, 3}
+	floats := make([]float64, len(ints))
+	for i, v := range ints {
+		floats[i] = float64(v)
+	}
+	d, f := NewDist(ints), NewFloatDist(floats)
+	if float64(d.P50) != f.P50 || float64(d.P90) != f.P90 || float64(d.Max) != f.Max || d.Mean != f.Mean {
+		t.Errorf("Dist %+v and FloatDist %+v disagree on the same values", d, f)
+	}
+	if got := NewFloatDist(nil); got != (FloatDist{}) {
+		t.Errorf("empty = %+v, want zero", got)
+	}
+	if got := NewFloatDist([]float64{0.98, 0.5}); got.Max != 0.98 || got.P50 != 0.5 {
+		t.Errorf("fractional values = %+v", got)
+	}
+}

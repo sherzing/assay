@@ -246,3 +246,38 @@ func TestRealRoslynOutput(t *testing.T) {
 		}
 	})
 }
+
+// A document with neither a version nor runs is not SARIF at all. Reading it as SARIF used to
+// yield "imported 0 findings", a clean bill of health for a file that was never read.
+func TestNonSarifJSONIsRefused(t *testing.T) {
+	for _, doc := range []string{`{}`, `{"formatVersion":13,"metricResults":[]}`, `{"records":[]}`} {
+		_, err := Import(strings.NewReader(doc), Options{})
+		if err == nil || !strings.Contains(err.Error(), "not a SARIF document") {
+			t.Errorf("%s: err = %v, want a refusal", doc, err)
+		}
+	}
+	if fs, err := Import(strings.NewReader(`{"version":"2.1.0"}`), Options{}); err != nil || len(fs) != 0 {
+		t.Errorf("a versioned document with no runs is empty, not wrong: %v, %v", fs, err)
+	}
+}
+
+// A run with no results still names its tool, which is what lets an import record a zero for it.
+func TestReportListsTheToolsThatRan(t *testing.T) {
+	two := `{"version":"2.1.0","runs":[
+	  {"tool":{"driver":{"name":"otherlint"}},"results":[]},
+	  {"tool":{"driver":{"name":"otherlint"}},"results":[]},
+	  {"tool":{"driver":{"name":"roslyn"}},"results":[]}]}`
+	rep, err := ImportReport(strings.NewReader(two), Options{})
+	if err != nil || len(rep.Findings) != 0 || strings.Join(rep.Tools, ",") != "otherlint,roslyn" {
+		t.Errorf("tools = %v, findings = %d, err = %v; want otherlint,roslyn once each", rep.Tools, len(rep.Findings), err)
+	}
+	if rep, _ := ImportReport(strings.NewReader(two), Options{ToolPrefix: "lint"}); strings.Join(rep.Tools, ",") != "lint" {
+		t.Errorf("with ToolPrefix tools = %v, want lint", rep.Tools)
+	}
+	if rep, _ := ImportReport(strings.NewReader(`{"version":"2.1.0","runs":[]}`), Options{}); len(rep.Tools) != 0 {
+		t.Errorf("no runs, yet tools = %v", rep.Tools)
+	}
+	if rep, _ := ImportReport(strings.NewReader(basic), Options{}); len(rep.Findings) != 1 || rep.Tools[0] != "testlint" {
+		t.Errorf("basic: %+v", rep)
+	}
+}

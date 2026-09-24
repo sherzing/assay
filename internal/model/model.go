@@ -111,12 +111,37 @@ func NewDist(vals []int) Dist {
 	return d
 }
 
-func pct(sorted []int, p float64) int {
+func pct[T int | float64](sorted []T, p float64) T {
 	if len(sorted) == 0 {
-		return 0
+		var zero T
+		return zero
 	}
 	i := int(p * float64(len(sorted)-1))
 	return sorted[i]
+}
+
+// FloatDist is Dist for a metric that is not integer-valued, such as an imported maintainability index.
+type FloatDist struct {
+	P50  float64 `json:"p50"`
+	P90  float64 `json:"p90"`
+	Max  float64 `json:"max"`
+	Mean float64 `json:"mean"`
+}
+
+// NewFloatDist builds a distribution with the same percentile rule as NewDist.
+func NewFloatDist(vals []float64) FloatDist {
+	if len(vals) == 0 {
+		return FloatDist{}
+	}
+	s := append([]float64(nil), vals...)
+	sort.Float64s(s)
+	d := FloatDist{P50: pct(s, 0.50), P90: pct(s, 0.90), Max: s[len(s)-1]}
+	sum := 0.0
+	for _, v := range s {
+		sum += v
+	}
+	d.Mean = sum / float64(len(s))
+	return d
 }
 
 // Summary is the roll-up used for the trend series. These are the numbers that
