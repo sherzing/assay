@@ -120,6 +120,14 @@ Three behaviours worth knowing:
   told no gets switched off entirely.
 - **Fingerprints exclude line numbers.** A reformat must not read as a wave of
   new violations. The producer's own `partialFingerprints` are used when present.
+- **Imported findings are first-class.** `.quality.yaml` verdicts apply to them,
+  and `ratchet import … --emit findings|measures` writes the same records a scan
+  does, so they reach `strata` and `docket`. `--repo`, `--commit` and `--ts`
+  stamp the records; `--ts` lets a history backfill land on its commit's day.
+  Findings carry `tool: sarif/<driver>`, and the counts are named per producer,
+  `findings.<driver>.total`, so they never overwrite the scan's own
+  `findings.total`; a clean run records its zero for every driver the document
+  names. As with `scan`, an invalid `.quality.yaml` fails the import.
 
 ---
 

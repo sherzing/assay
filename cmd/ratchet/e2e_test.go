@@ -611,6 +611,58 @@ func TestImportSarifBaselineAndCheck(t *testing.T) {
 		MustSay(t, "unknown mode")
 }
 
+func TestImportAppliesConfigVerdictsAndEmitsRecords(t *testing.T) {
+	bin := ratchet(t)
+	dir := cmdtest.Tree(t, map[string]string{
+		".quality.yaml": "verdicts:\n  - rule: otherlint:NULLREF\n    verdict: wont-fix\n    reason: guarded by the caller\n",
+		"r.sarif": `{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"otherlint"}},"results":[
+  {"ruleId":"NULLREF","level":"error","message":{"text":"possible nil dereference"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/Handler.cs"},"region":{"startLine":42,"startColumn":9}}}]},
+  {"ruleId":"UNUSED","level":"warning","message":{"text":"unused local"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"src/Parser.cs"},"region":{"startLine":7,"startColumn":3}}}]}]}]}`,
+		"clean.sarif":  `{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"otherlint"}},"results":[]}]}`,
+		"noruns.sarif": `{"version":"2.1.0","runs":[]}`,
+		"not.json":     `{"records":[]}`,
+	})
+
+	bin.Run(t, dir, "import", "r.sarif", "--root", ".", "--json").MustPass(t).
+		MustSay(t, `"verdict": "wont-fix"`, `"verdictSource": "config"`)
+
+	f := bin.Run(t, dir, "import", "r.sarif", "--root", ".", "--emit", "findings",
+		"--repo", "svc", "--commit", "abc123", "--ts", "2026-01-15", "--org=-").MustPass(t)
+	f.MustSay(t, `"kind":"finding"`, `"tool":"sarif/otherlint"`, `"rule":"otherlint:UNUSED"`, `"repo":"svc"`,
+		`"commit":"abc123"`, `"ts":"2026-01-15T00:00:00Z"`, `"kind":"verdict"`, `"verdict":"wont-fix"`)
+	f.MustNotSay(t, `"kind":"measure"`, `"tool":"ratchet"`)
+
+	// The counts are named per producer, so an import never overwrites the scan's own findings.total.
+	m := bin.Run(t, dir, "import", "r.sarif", "--root", ".", "--emit", "measures", "--repo", "svc", "--org=-").MustPass(t)
+	m.MustSay(t, `"kind":"measure"`, `"metric":"findings.otherlint.total","value":2`, `"metric":"findings.rule.otherlint:NULLREF"`)
+	m.MustNotSay(t, `"metric":"findings.total"`)
+
+	// A clean run records its zero: the document names the driver. With no runs at all there is
+	// no producer to name unless --tool does.
+	bin.Run(t, dir, "import", "clean.sarif", "--root", ".", "--emit", "measures", "--org=-").MustPass(t).
+		MustSay(t, `"metric":"findings.otherlint.total","value":0`)
+	z := bin.Run(t, dir, "import", "noruns.sarif", "--root", ".", "--emit", "measures", "--org=-").MustPass(t)
+	z.MustSay(t, "pass --tool")
+	z.MustNotSay(t, `"kind":"measure"`)
+	bin.Run(t, dir, "import", "noruns.sarif", "--root", ".", "--emit", "measures", "--tool", "otherlint", "--org=-").MustPass(t).
+		MustSay(t, `"metric":"findings.otherlint.total","value":0`)
+
+	bin.Run(t, dir, "import", "r.sarif", "--root", ".", "--emit", "measures", "--ts", "yesterday").MustFail(t).
+		MustSay(t, "want YYYY-MM-DD")
+	bin.Run(t, dir, "import", "r.sarif", "--root", ".", "--emit", "sideways").MustFail(t).MustSay(t, "unknown --emit")
+	bin.Run(t, dir, "import", "not.json", "--root", ".").MustFail(t).MustSay(t, "not a SARIF document")
+}
+
+// import validates .quality.yaml the way scan does: a bad verdict fails the import instead of being ignored.
+func TestImportRejectsAnInvalidConfig(t *testing.T) {
+	bin := ratchet(t)
+	dir := cmdtest.Tree(t, map[string]string{
+		".quality.yaml": "verdicts:\n  - rule: otherlint:NULLREF\n    verdict: wont-fix\n",
+		"r.sarif":       `{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"otherlint"}},"results":[]}]}`,
+	})
+	bin.Run(t, dir, "import", "r.sarif", "--root", ".").MustFail(t).MustSay(t, "needs a reason")
+}
+
 // exceptions is the "what have we agreed to live with" report. Its value is
 // that an expired review-by date is visible; an exception nobody revisits is
 // how a baseline becomes permanent.

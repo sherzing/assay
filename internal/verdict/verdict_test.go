@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sherzing/assay/internal/model"
 	"github.com/sherzing/assay/pkg/schema"
 )
 
@@ -210,5 +211,19 @@ func TestResolveOrgPrecedence(t *testing.T) {
 		if got := ResolveOrg(c.flag, c.cfg, c.email); got != c.want {
 			t.Errorf("ResolveOrg(%q,%q,%q) = %q, want %q", c.flag, c.cfg, c.email, got, c.want)
 		}
+	}
+}
+
+func TestApplyStampsEveryField(t *testing.T) {
+	var f model.Finding
+	Apply(&f, V{Verdict: schema.WontFix, Reason: "guarded", Source: "config",
+		Until: time.Date(2027, 1, 2, 0, 0, 0, 0, time.UTC)})
+	if f.Verdict != "wont-fix" || f.VerdictWhy != "guarded" || f.VerdictFrom != "config" || f.VerdictUntil != "2027-01-02" {
+		t.Errorf("stamped %+v", f)
+	}
+	var g model.Finding
+	Apply(&g, V{Verdict: schema.Accepted, Reason: "debt"})
+	if g.VerdictUntil != "" {
+		t.Errorf("a permanent verdict got an expiry: %q", g.VerdictUntil)
 	}
 }

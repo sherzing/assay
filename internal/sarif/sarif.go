@@ -13,6 +13,7 @@
 package sarif
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -103,6 +104,62 @@ type Options struct {
 	IncludeSuppressed bool
 }
 
+// Report is what one SARIF document yields: its findings, and the tools that ran, so a run
+// with no results can still be counted as a zero for its producer.
+type Report struct {
+	Findings []model.Finding
+	Tools    []string // driver names, ToolPrefix applied, in run order without repeats
+}
+
+// ImportReport reads SARIF and returns the findings and the tools that ran.
+func ImportReport(r io.Reader, opt Options) (*Report, error) {
+	raw, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("read sarif: %w", err)
+	}
+	findings, err := Import(bytes.NewReader(raw), opt)
+	if err != nil {
+		return nil, err
+	}
+	return &Report{Findings: findings, Tools: tools(raw, opt)}, nil
+}
+
+// toolName is the producer a run's rules are namespaced by.
+func toolName(driver string, opt Options) string {
+	if opt.ToolPrefix != "" {
+		return opt.ToolPrefix
+	}
+	if driver == "" {
+		return "sarif"
+	}
+	return driver
+}
+
+// tools lists the producers a document names, so a clean run still has a series to be zero in.
+func tools(raw []byte, opt Options) []string {
+	var d struct {
+		Runs []struct {
+			Tool struct {
+				Driver struct {
+					Name string `json:"name"`
+				} `json:"driver"`
+			} `json:"tool"`
+		} `json:"runs"`
+	}
+	if json.Unmarshal(raw, &d) != nil {
+		return nil
+	}
+	var out []string
+	seen := map[string]bool{}
+	for _, rn := range d.Runs {
+		if t := toolName(rn.Tool.Driver.Name, opt); !seen[t] {
+			seen[t] = true
+			out = append(out, t)
+		}
+	}
+	return out
+}
+
 // Import reads SARIF and returns findings.
 func Import(r io.Reader, opt Options) ([]model.Finding, error) {
 	raw, err := io.ReadAll(r)
@@ -120,10 +177,14 @@ func Import(r io.Reader, opt Options) ([]model.Finding, error) {
 	// the output of a .NET build. A version probe first means the diagnosis
 	// comes out instead of the symptom.
 	var probe struct {
-		Version string `json:"version"`
+		Version string          `json:"version"`
+		Runs    json.RawMessage `json:"runs"`
 	}
 	if err := json.Unmarshal(raw, &probe); err != nil {
 		return nil, fmt.Errorf("parse sarif: %w", err)
+	}
+	if strings.TrimSpace(probe.Version) == "" && len(probe.Runs) == 0 {
+		return nil, fmt.Errorf("not a SARIF document: it has neither a version nor runs")
 	}
 	d := doc{Version: probe.Version}
 
@@ -151,13 +212,7 @@ func Import(r io.Reader, opt Options) ([]model.Finding, error) {
 
 	var out []model.Finding
 	for _, rn := range d.Runs {
-		tool := rn.Tool.Driver.Name
-		if opt.ToolPrefix != "" {
-			tool = opt.ToolPrefix
-		}
-		if tool == "" {
-			tool = "sarif"
-		}
+		tool := toolName(rn.Tool.Driver.Name, opt)
 
 		// Rule metadata gives us a description and a default severity for
 		// results that omit `level`.

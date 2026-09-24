@@ -70,7 +70,7 @@ usage:
 
 findings come in on stdin:
   ratchet scan . --emit findings --repo myservice | docket plan
-  ratchet import roslyn.sarif --mode report --json | jq -c '.findings[]' | docket plan
+  ratchet import roslyn.sarif --emit findings --repo myservice | docket plan
 `)
 }
 

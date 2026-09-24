@@ -136,10 +136,7 @@ func (p *smellPass) add(rule string, n ast.Node, msg, suggest string) {
 		Fingerprint: model.Fingerprint(p.relPath, rule, fn, p.snippet(n)),
 	}
 	if judged {
-		f.Verdict, f.VerdictWhy, f.VerdictFrom = string(v.Verdict), v.Reason, v.Source
-		if !v.Until.IsZero() {
-			f.VerdictUntil = v.Until.Format("2006-01-02")
-		}
+		verdict.Apply(&f, v)
 	}
 	p.findings = append(p.findings, f)
 }
