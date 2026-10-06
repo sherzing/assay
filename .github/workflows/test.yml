@@ -31,8 +31,11 @@ jobs:
                      || format('{0}..{1}', github.event.before, github.sha) }}"
           # First push to a branch reports an all-zero "before"; check the tip.
           case "$range" in *0000000000000000000000000000000000000000*) range="HEAD~1..HEAD" ;; esac
+          # The author must be allowed. The committer may also be GitHub itself:
+          # a merge made through the pull request UI is committed as
+          # noreply@github.com, and that is not a hostname fallback.
           bad=$(git log --format='%H %ae %ce' "$range" 2>/dev/null \
-                | awk -v ok="$allowed" '$2 != ok || $3 != ok')
+                | awk -v ok="$allowed" '$2 != ok || ($3 != ok && $3 != "noreply@github.com")')
           if [ -n "$bad" ]; then
             echo "commits with an unapproved author or committer email:"
             echo "$bad"
