@@ -1,5 +1,5 @@
 // Command plumb checks a codebase against what ARCHITECTURE.md declares: which
-// layers may reach which (`forbid`, over the import graph) and which layer owns
+// groups of packages may reach which (`forbid`, over the import graph) and which group owns
 // which vocabulary (`owns`, over declared names). The first is reachability;
 // the second is responsibility. Neither implies the other.
 //
@@ -23,7 +23,7 @@ import (
 	"github.com/sherzing/assay/pkg/schema"
 )
 
-const usage = `plumb — verify a codebase against the layering and ownership it declares
+const usage = `plumb — verify a codebase against the dependency and ownership rules it declares
 
   plumb check [dir]      fail on violations not in the baseline
   plumb scan  [dir]      report every violation, exit 0
@@ -46,21 +46,28 @@ Flags
 
 The declaration is a fenced ` + "```arch" + ` block inside the document:
 
-    layer cart     internal/cart
-    layer rating   internal/rating
-    layer infra    internal/impl internal/store
-    forbid cart -> infra
-    owns cart      cart line-item checkout
-    owns rating    rating review score
+    group orders    internal/orders
+    group payments  internal/payments
+    group shared    internal/shared
+    forbid orders   -> payments
+    forbid payments -> orders
+    forbid shared   -> orders
+    forbid shared   -> payments
+    owns orders     order line-item checkout
+    owns payments   payment refund charge
+
+A group is a named set of directories; layer is accepted as a synonym. plumb
+has no opinion on how many groups there are or which way dependencies point:
+two groups and one rule is a complete declaration.
 
 forbid governs which packages may REACH which, transitively: a direct-import
-rule misses cart -> helper -> infra, which is the same dependency one hop away
-and is what an ordinary refactor produces.
+rule misses orders -> helper -> payments, which is the same dependency one hop
+away and is what an ordinary refactor produces.
 
-owns governs what a layer may DECLARE. A type or function in cart whose name
-carries rating's vocabulary is flagged; cart calling rating's API is not. A layer
-with no owns line is a consumer and is never checked. Only Go is supported for
-forbid; owns reads Go, C#, Dart, TypeScript, Java, Kotlin and Python.
+owns governs what a group may DECLARE. A type or function in orders whose name
+carries payments' vocabulary is flagged; orders calling payments' API is not. A
+group with no owns line is a consumer and is never checked. Only Go is
+supported for forbid; owns reads Go, C#, Dart, TypeScript, Java, Kotlin and Python.
 `
 
 func main() {
@@ -225,7 +232,7 @@ func run(args []string, gate bool) error {
 
 	if l.graph != nil {
 		for _, dead := range arch.DeadLayers(d, l.graph) {
-			fmt.Fprintf(os.Stderr, "warning: layer %q matches no package — a rule guarding a directory that does not exist protects nobody\n", dead)
+			fmt.Fprintf(os.Stderr, "warning: group %q matches no package — a rule guarding a directory that does not exist protects nobody\n", dead)
 		}
 	}
 
@@ -278,7 +285,7 @@ func printDrift(ds []arch.Drift, owners int) {
 	if owners == 0 {
 		return
 	}
-	fmt.Printf("\n%d owning layers, %d responsibility drifts\n", owners, len(ds))
+	fmt.Printf("\n%d owning groups, %d responsibility drifts\n", owners, len(ds))
 	cur := ""
 	for _, d := range ds {
 		if k := d.Layer + " → " + d.Owner; k != cur {
@@ -312,7 +319,7 @@ func cmdLearn(args []string) error {
 	fmt.Fprint(os.Stderr, "note: this draft lists your internal domain vocabulary with counts.\n"+
 		"      Review it before pasting anywhere public.\n\n")
 	if d == nil {
-		fmt.Printf("# no %s — contexts are directories at depth %d; replace them with layer names\n", o.doc, o.depth)
+		fmt.Printf("# no %s — contexts are directories at depth %d; replace them with group names\n", o.doc, o.depth)
 	}
 	fmt.Print(formatDraft(lines))
 	fmt.Print("\n# This is a draft, not a finding.\n" +
@@ -321,7 +328,7 @@ func cmdLearn(args []string) error {
 		"#   2. Strike generic verbs and adjectives: modify, applied, general, unknown,\n" +
 		"#      where, access, content. A term that could name anything names nothing,\n" +
 		"#      and owning one flags every use of it in the codebase.\n" +
-		"#   3. Keep five to ten terms per layer, paste the rest into the arch block,\n" +
+		"#   3. Keep five to ten terms per group, paste the rest into the arch block,\n" +
 		"#      then `plumb scan` and read every finding.\n")
 	return nil
 }

@@ -25,7 +25,10 @@ import (
 
 // Decl is a parsed architecture declaration.
 type Decl struct {
-	// Layers maps a layer name to the module-relative path prefixes in it.
+	// Layers maps a group name to the module-relative path prefixes in it.
+	// The keyword is `group`; `layer` is accepted as a synonym. The field keeps
+	// its old name because renaming it buys nothing a reader of the document
+	// would see.
 	Layers map[string][]string
 	// Order is declaration order, so output does not depend on map iteration.
 	Order []string
@@ -94,14 +97,14 @@ func Parse(body string, lineBase int) (*Decl, error) {
 		n := lineBase + i
 
 		switch {
-		case strings.HasPrefix(line, "layer "):
+		case strings.HasPrefix(line, "group "), strings.HasPrefix(line, "layer "):
 			f := strings.Fields(line)
 			if len(f) < 3 {
-				return nil, fmt.Errorf("line %d: layer needs a name and at least one path: %q", n, line)
+				return nil, fmt.Errorf("line %d: group needs a name and at least one path: %q", n, line)
 			}
 			name := f[1]
 			if _, dup := d.Layers[name]; dup {
-				return nil, fmt.Errorf("line %d: layer %q declared twice", n, name)
+				return nil, fmt.Errorf("line %d: group %q declared twice", n, name)
 			}
 			paths := make([]string, 0, len(f)-2)
 			for _, p := range f[2:] {
@@ -113,14 +116,14 @@ func Parse(body string, lineBase int) (*Decl, error) {
 		case strings.HasPrefix(line, "forbid"):
 			g := forbidRe.FindStringSubmatch(line)
 			if g == nil {
-				return nil, fmt.Errorf("line %d: expected `forbid <layer> -> <layer>`, got %q", n, line)
+				return nil, fmt.Errorf("line %d: expected `forbid <group> -> <group>`, got %q", n, line)
 			}
 			d.Forbids = append(d.Forbids, Forbid{From: g[1], To: g[2], Line: n})
 
 		case strings.HasPrefix(line, "owns "):
 			f := strings.Fields(line)
 			if len(f) < 3 {
-				return nil, fmt.Errorf("line %d: owns needs a layer and at least one term: %q", n, line)
+				return nil, fmt.Errorf("line %d: owns needs a group and at least one term: %q", n, line)
 			}
 			terms := make([]string, 0, len(f)-2)
 			for _, t := range f[2:] {
@@ -131,7 +134,7 @@ func Parse(body string, lineBase int) (*Decl, error) {
 		default:
 			// Not ignored. A misspelled `forbidd` silently dropping a
 			// constraint is precisely how a gate stops meaning anything.
-			return nil, fmt.Errorf("line %d: unknown statement %q (expected `layer`, `forbid` or `owns`)", n, strings.Fields(line)[0])
+			return nil, fmt.Errorf("line %d: unknown statement %q (expected `group`, `forbid` or `owns`; `layer` is accepted as a synonym of `group`)", n, strings.Fields(line)[0])
 		}
 	}
 
@@ -140,7 +143,7 @@ func Parse(body string, lineBase int) (*Decl, error) {
 	ownerOf := map[string]string{}
 	for _, o := range owns {
 		if _, ok := d.Layers[o.layer]; !ok {
-			return nil, fmt.Errorf("line %d: owns references undeclared layer %q", o.line, o.layer)
+			return nil, fmt.Errorf("line %d: owns references undeclared group %q", o.line, o.layer)
 		}
 		if _, seen := d.Owns[o.layer]; !seen {
 			d.OwnsOrder = append(d.OwnsOrder, o.layer)
@@ -162,13 +165,13 @@ func Parse(body string, lineBase int) (*Decl, error) {
 	}
 	for _, f := range d.Forbids {
 		if _, ok := d.Layers[f.From]; !ok {
-			return nil, fmt.Errorf("line %d: forbid references undeclared layer %q", f.Line, f.From)
+			return nil, fmt.Errorf("line %d: forbid references undeclared group %q", f.Line, f.From)
 		}
 		if _, ok := d.Layers[f.To]; !ok {
-			return nil, fmt.Errorf("line %d: forbid references undeclared layer %q", f.Line, f.To)
+			return nil, fmt.Errorf("line %d: forbid references undeclared group %q", f.Line, f.To)
 		}
 		if f.From == f.To {
-			return nil, fmt.Errorf("line %d: layer %q cannot be forbidden from itself", f.Line, f.From)
+			return nil, fmt.Errorf("line %d: group %q cannot be forbidden from itself", f.Line, f.From)
 		}
 	}
 	return d, nil

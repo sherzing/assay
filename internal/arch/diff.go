@@ -12,9 +12,9 @@ const (
 	// NoChange means the two declarations are semantically identical.
 	// Reordering statements is not a change.
 	NoChange Change = iota
-	// Tightening adds a rule or narrows a layer. Strictly more is forbidden.
+	// Tightening adds a rule or narrows a group. Strictly more is forbidden.
 	Tightening
-	// Loosening removes a rule or widens a layer. Strictly less is forbidden.
+	// Loosening removes a rule or widens a group. Strictly less is forbidden.
 	Loosening
 	// Mixed both tightens and loosens.
 	Mixed
@@ -56,17 +56,17 @@ func Diff(old, new *Decl) (Change, []string) {
 		}
 	}
 
-	// A layer that grows brings more packages under its rules; one that shrinks
+	// A group that grows brings more packages under its rules; one that shrinks
 	// releases packages from them. Same logic, one level down.
 	for _, name := range union(old.Order, new.Order) {
 		o, inOld := old.Layers[name]
 		n, inNew := new.Layers[name]
 		switch {
 		case inOld && !inNew:
-			removed = append(removed, "- layer "+name)
+			removed = append(removed, "- group "+name)
 			continue
 		case !inOld && inNew:
-			added = append(added, "+ layer "+name)
+			added = append(added, "+ group "+name)
 			continue
 		}
 		os, ns := set(o), set(n)

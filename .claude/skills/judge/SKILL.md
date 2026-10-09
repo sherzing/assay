@@ -1,6 +1,6 @@
 ---
 name: judge
-description: Judge whether declarations belong in the layer they sit in, according to ARCHITECTURE.md, and emit assay findings. Use when asked to review architecture intent, responsibility drift, or "does this code belong here" over a repo or a branch.
+description: Judge whether declarations belong in the group they sit in, according to ARCHITECTURE.md, and emit assay findings. Use when asked to review architecture intent, responsibility drift, or "does this code belong here" over a repo or a branch.
 ---
 
 # judge — responsibility review, by Claude Code
@@ -18,19 +18,19 @@ verification, and the output lands in the same finding records.
        judge cases . > /tmp/judge-cases.jsonl          # whole tree
        judge cases . --base origin/main > /tmp/judge-cases.jsonl   # this branch only
 
-   Each line is `{"decl":{"Layer","Name","File","Line"},"excerpt":"..."}`.
+   Each line is `{"decl":{"Group","Name","File","Line"},"excerpt":"..."}`.
    If `judge` is not on PATH, build it: `go build ./cmd/judge` in the assay repo.
 
 2. Read `ARCHITECTURE.md`. The prose above the ` ```arch ` block is the intent;
-   the block names the layers and what each owns. The document is the only
+   the block names the groups and what each owns. The document is the only
    authority. Your own opinion of good design is not.
 
 3. For each case, decide, following these rules exactly:
    - The declaration belongs unless the document gives a specific reason it
      does not. Judge responsibility, not dependencies: what the code imports
-     is not your concern; whether this concept is this layer's job is.
-   - When it does not belong, name the layer it belongs in, using only the
-     layer names in the block.
+     is not your concern; whether this concept is this group's job is.
+   - When it does not belong, name the group it belongs in, using only the
+     group names in the block.
    - Quote one sentence from the document, verbatim, that supports the
      judgement. Copy it exactly. A paraphrase is discarded by the verifier.
      If no sentence supports a finding, the declaration belongs.
@@ -41,10 +41,10 @@ verification, and the output lands in the same finding records.
 4. Write one JSON object per case to `/tmp/judge-answers.jsonl`:
 
        {"file":"internal/cart/x.go","line":9,"name":"AverageStars","in":"cart",
-        "belongs":false,"layer":"rating","reason":"averages ratings","citation":"<verbatim sentence>"}
+        "belongs":false,"group":"rating","reason":"averages ratings","citation":"<verbatim sentence>"}
 
    `file`, `line`, `name` and `in` are copied from the case. Include every
-   case, with `"belongs":true` and empty `layer`/`reason`/`citation` when it
+   case, with `"belongs":true` and empty `group`/`reason`/`citation` when it
    belongs.
 
 5. Verify and emit:
@@ -53,7 +53,7 @@ verification, and the output lands in the same finding records.
        judge verify . --answers /tmp/judge-answers.jsonl --model claude-code-skill --emit findings > judged.jsonl
 
    The verifier drops answers whose citation is not in the document or whose
-   layer is not declared, and says so. Report the findings and the dropped
+   group is not declared, and says so. Report the findings and the dropped
    lines to the user; a high drop rate means the document does not say
    enough, which is a fact about the document.
 

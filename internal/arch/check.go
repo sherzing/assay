@@ -136,6 +136,10 @@ func Report(d *Decl, g *Graph, vs []Violation, drifts []Drift) *model.Report {
 
 // DeadLayers names declared paths that match no package.
 //
+// The rule id stays "layer-violation": it is part of every fingerprint in
+// every committed baseline, and renaming it would make all of them reappear
+// as new.
+//
 // A rule guarding a directory that no longer exists is a rule everyone believes
 // is protecting them. Worth a warning, not a failure: the directory may be
 // about to be created.

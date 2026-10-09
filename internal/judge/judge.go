@@ -3,7 +3,7 @@
 //
 // Plumb's two rules are deterministic: forbid over the import graph, owns over
 // declared names. Both are blind to a function named ApplyDiscount in the cart
-// layer that actually averages ratings. A judge that reads the body and the
+// group that actually averages ratings. A judge that reads the body and the
 // document is not. It is also probabilistic, so it is built as one more linter
 // under the same discipline as every other rule, not as an oracle:
 //
@@ -37,19 +37,19 @@ import (
 	"github.com/sherzing/assay/internal/model"
 )
 
-//go:embed prompts/intent-drift.v1.md
-var promptV1 string
+//go:embed prompts/intent-drift.v2.md
+var prompt string
 
 // Rule is the rule id. The suffix is the prompt version: bump it when the
 // prompt changes, so precision data never mixes two prompts.
-const Rule = "intent-drift@1"
+const Rule = "intent-drift@2"
 
 // answerProperties is the shape of one answer; Schema and the batch schema are
 // both built from it so the two can never drift apart.
 func answerProperties() (map[string]any, []string) {
 	return map[string]any{
-		"belongs":  map[string]any{"type": "boolean", "description": "true if the declaration belongs in its layer"},
-		"layer":    map[string]any{"type": "string", "description": "the layer it belongs in; the current layer when belongs is true"},
+		"belongs":  map[string]any{"type": "boolean", "description": "true if the declaration belongs in its group"},
+		"layer":    map[string]any{"type": "string", "description": "the group it belongs in; the current group when belongs is true"},
 		"reason":   map[string]any{"type": "string", "description": "one sentence naming the concept that is out of place"},
 		"citation": map[string]any{"type": "string", "description": "one sentence copied verbatim from the architecture document"},
 	}, []string{"belongs", "layer", "reason", "citation"}
@@ -112,7 +112,7 @@ type Answered struct {
 	File string `json:"file"`
 	Line int    `json:"line"`
 	Name string `json:"name"`
-	In   string `json:"in"` // the layer it is declared in
+	In   string `json:"in"` // the group it is declared in
 	Answer
 }
 
@@ -158,20 +158,20 @@ type Dropped struct {
 // for every case in a run and across runs until the document changes, which is
 // what makes it worth caching at the provider.
 func System(doc string) string {
-	return promptV1 + doc
+	return prompt + doc
 }
 
 // Request renders one case.
 func Request(d *arch.Decl, c Case) string {
 	var b strings.Builder
-	b.WriteString("Layers, with the directories each covers:\n")
+	b.WriteString("Groups, with the directories each covers:\n")
 	for _, name := range d.Order {
 		fmt.Fprintf(&b, "  %-12s %s\n", name, strings.Join(d.Layers[name], " "))
 	}
 	if terms, ok := d.Owns[c.Decl.Layer]; ok {
 		fmt.Fprintf(&b, "\nDeclared vocabulary of %s: %s\n", c.Decl.Layer, strings.Join(terms, " "))
 	}
-	fmt.Fprintf(&b, "\nDeclaration under review:\n  layer: %s\n  name:  %s\n  file:  %s:%d\n\n```\n%s\n```\n",
+	fmt.Fprintf(&b, "\nDeclaration under review:\n  group: %s\n  name:  %s\n  file:  %s:%d\n\n```\n%s\n```\n",
 		c.Decl.Layer, c.Decl.Name, c.Decl.File, c.Decl.Line, c.Excerpt)
 	return b.String()
 }
@@ -322,9 +322,9 @@ func verify(res *Result, o Options, cases []Case, answers []Answer) {
 		// wrong in a way a reader could not tell from the text.
 		switch {
 		case !layers[ans.Layer]:
-			res.Dropped = append(res.Dropped, Dropped{c, ans, fmt.Sprintf("names a layer that is not declared: %q", ans.Layer)})
+			res.Dropped = append(res.Dropped, Dropped{c, ans, fmt.Sprintf("names a group that is not declared: %q", ans.Layer)})
 		case ans.Layer == c.Decl.Layer:
-			res.Dropped = append(res.Dropped, Dropped{c, ans, "says it does not belong but names the same layer"})
+			res.Dropped = append(res.Dropped, Dropped{c, ans, "says it does not belong but names the same group"})
 		case strings.TrimSpace(ans.Citation) == "":
 			res.Dropped = append(res.Dropped, Dropped{c, ans, "no citation"})
 		case !strings.Contains(docNorm, normalise(ans.Citation)):

@@ -23,11 +23,11 @@ imported rendering, a change to output formatting could alter a number. If it
 imported the store, a scan would need a store to exist. If it imported the
 baseline, "what is wrong" and "what we tolerate" would blur into one function.
 
-**Each layer declares its own concepts.** The rule above says who may *reach*
+**Each group declares its own concepts.** The rule above says who may *reach*
 whom. It cannot say whether a declaration *belongs*: a rollup function inside
 the baseline package is perfectly layered and still in the wrong place. So each
-layer below names the vocabulary it owns. A type or function whose name carries
-another layer's vocabulary is responsibility drift, wherever its imports point.
+group below names the vocabulary it owns. A type or function whose name carries
+another group's vocabulary is responsibility drift, wherever its imports point.
 
 ## How the tools fit together
 
@@ -59,9 +59,9 @@ is an error rather than a no-op, so a typo cannot silently drop a rule.
 
 | statement | meaning |
 |---|---|
-| `layer <name> <path>...` | Names a layer and the module-relative directories in it. A package belongs to the layer with the longest matching prefix, so `internal/domain/billing` in its own layer beats `internal/domain` in another. |
-| `forbid <a> -> <b>` | No package in layer `a` may reach any package in layer `b`, **transitively**. A direct-import check would miss `a -> helper -> b`, which is the same dependency one hop away and is what an ordinary refactor produces. Go only. |
-| `owns <layer> <term>...` | The vocabulary this layer declares. A type or function in this layer whose name carries a term another layer owns is `responsibility-drift`. Calls are never checked; that is what `forbid` is for. A term has exactly one owner. A layer with no `owns` line is a consumer and is never checked. Any language `plumb` can read. |
+| `group <name> <path>...` | Names a group and the module-relative directories in it. `layer` is accepted as a synonym; it means nothing more than `group`. A package belongs to the group with the longest matching prefix, so `internal/domain/billing` in its own group beats `internal/domain` in another. |
+| `forbid <a> -> <b>` | No package in group `a` may reach any package in group `b`, **transitively**. A direct-import check would miss `a -> helper -> b`, which is the same dependency one hop away and is what an ordinary refactor produces. Go only. |
+| `owns <group> <term>...` | The vocabulary this group declares. A type or function in this group whose name carries a term another group owns is `responsibility-drift`. Calls are never checked; that is what `forbid` is for. A term has exactly one owner. A group with no `owns` line is a consumer and is never checked. Any language `plumb` can read. |
 
 Both rules are checked against the code by `plumb`, tolerated by
 `.plumb-baseline.json`, and classified on change by `plumb diff`: adding a
@@ -75,15 +75,15 @@ that the previous version did not have. The reviewer is the pull request review.
      loosening needs a second reviewer and an entry under Why. -->
 
 ```arch
-layer schema      pkg/schema
-layer model       internal/model
-layer analysis    internal/analyze internal/arch internal/learn internal/judge
-layer verdicts    internal/verdict
-layer history     internal/store internal/evidence
-layer gate        internal/baseline
-layer tickets     internal/docket
-layer import      internal/sarif
-layer presenting  internal/report
+group schema      pkg/schema
+group model       internal/model
+group analysis    internal/analyze internal/arch internal/learn internal/judge
+group verdicts    internal/verdict
+group history     internal/store internal/evidence
+group gate        internal/baseline
+group tickets     internal/docket
+group import      internal/sarif
+group presenting  internal/report
 
 # The schema depends on nothing.
 forbid schema    -> model
@@ -114,7 +114,7 @@ forbid tickets   -> history
 forbid presenting -> analysis
 forbid presenting -> history
 
-# What each layer may declare. A term has one owner; a layer with no line
+# What each group may declare. A term has one owner; a group with no line
 # is a consumer and may name anything.
 owns schema      encoder decoder kind judgement
 owns model       metric summary dist cognitive cyclomatic nesting
@@ -134,14 +134,20 @@ already followed — so this records an existing shape rather than imposing a ne
 one. A declaration that fails on the day it is written teaches everyone to
 ignore it.
 
-**2026-09-22.** Split the former `internals` layer into `model`, `verdicts`,
-`history`, `gate`, `tickets` and `import`, and added ownership. The old layer
+**2026-09-22.** Split the former `internals` group into `model`, `verdicts`,
+`history`, `gate`, `tickets` and `import`, and added ownership. The old group
 was a bucket: six packages with six different jobs, and a rule that only said
 the schema must not reach any of them. Every `forbid` above was checked against
 the import graph before it was written, so this is still a record of the shape
 the code has, only at a resolution where ownership means something.
 
-Terms deliberately left unowned, because two layers legitimately declare them:
+**2026-10-09.** The keyword is `group`; `layer` remains a synonym. The checks never
+assumed a style, but the word did: it reads as clean architecture to anyone
+who has heard of it, and the README example was a textbook onion. A group is a
+named set of directories and nothing more. Two groups and one rule is a
+complete declaration. No rule here changed.
+
+Terms deliberately left unowned, because two groups legitimately declare them:
 `finding` and `severity` (the wire record in `schema` and the internal model in
 `model`), `verdict` and `ticket` (the record and the package that interprets
 it), `sarif` (read by `import`, written by `presenting`), `measure` (a record,
@@ -151,4 +157,4 @@ on the first scan, which is the fastest way to get it switched off.
 The tools-do-not-import-each-other rule is not expressible here: `plumb`
 covers package dependencies, and `cmd/*` are separate mains that the import
 graph already keeps apart. It is checked by the fact that each binary builds
-alone. If that ever stops being true, add a layer per command.
+alone. If that ever stops being true, add a group per command.

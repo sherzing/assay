@@ -164,3 +164,19 @@ func TestOnlyTheFirstBlockIsRead(t *testing.T) {
 		t.Errorf("got %d forbids, want 1 — a later fenced block leaked in", len(d.Forbids))
 	}
 }
+
+// group is the keyword; layer is the synonym the first release shipped with.
+// Both must parse to the same declaration, so no document has to change.
+func TestGroupAndLayerAreSynonyms(t *testing.T) {
+	g, err := Parse("group a x\ngroup b y\nforbid a -> b\n", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	l, err := Parse("layer a x\nlayer b y\nforbid a -> b\n", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c, _ := Diff(g, l); c != NoChange {
+		t.Errorf("group and layer parsed differently: %s", c)
+	}
+}

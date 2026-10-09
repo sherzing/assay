@@ -1,4 +1,4 @@
-// Command judge asks a model whether each declaration belongs in the layer it
+// Command judge asks a model whether each declaration belongs in the group it
 // sits in, according to the prose of ARCHITECTURE.md.
 //
 // It is the probabilistic companion to plumb, and deliberately a separate
@@ -36,7 +36,7 @@ Flags
   --base-url <url>   override the provider endpoint (default $JUDGE_BASE_URL)
   --effort <level>   anthropic: low | medium | high (default low)
   --base <ref>       only declarations in files changed against this git ref
-  --layer <name>     only declarations in this layer
+  --group <name>     only declarations in this group (--layer is a synonym)
   --context N        lines of source shown per declaration (default 60)
   --jobs N           parallel requests (default 4)
   --cache <dir>      response cache (default .assay/judge; "-" disables)
@@ -107,7 +107,8 @@ func parseArgs(args []string) (opts, error) {
 	fs.StringVar(&o.cfg.BaseURL, "base-url", o.cfg.BaseURL, "endpoint override")
 	fs.StringVar(&o.cfg.Effort, "effort", o.cfg.Effort, "anthropic effort")
 	fs.StringVar(&o.base, "base", "", "git ref to diff against")
-	fs.StringVar(&o.layer, "layer", "", "only this layer")
+	fs.StringVar(&o.layer, "group", "", "only this group")
+	fs.StringVar(&o.layer, "layer", "", "synonym of --group")
 	fs.StringVar(&o.emit, "emit", "", "emit JSONL: findings")
 	fs.StringVar(&o.cache, "cache", o.cache, "response cache dir")
 	fs.IntVar(&o.context, "context", o.context, "source lines per declaration")
@@ -323,7 +324,7 @@ func cmdDoctor(args []string) error {
 		return err
 	}
 	d := &arch.Decl{Layers: map[string][]string{"a": {"a"}, "b": {"b"}}, Order: []string{"a", "b"}, Owns: map[string][]string{}}
-	doc := "# Architecture\n\nLayer a holds apples. Layer b holds bananas.\n"
+	doc := "# Architecture\n\nGroup a holds apples. Group b holds bananas.\n"
 	c := judge.Case{Decl: arch.Declaration{Layer: "a", Name: "PeelBanana", File: "a/x.go", Line: 1}, Excerpt: "func PeelBanana() {}"}
 	raw, usage, err := p.Ask(context.Background(), judge.System(doc), judge.Request(d, c))
 	if err != nil {

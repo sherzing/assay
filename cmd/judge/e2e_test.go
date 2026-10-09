@@ -41,7 +41,7 @@ func TestScanEmitsVerifiedFindings(t *testing.T) {
 	})
 	args := []string{"scan", ".", "--provider", "codex", "--model", "m", "--base-url", srv.URL, "--emit", "findings"}
 	r := bin.Run(t, dir, args...)
-	r.MustPass(t).MustSay(t, `"rule":"intent-drift@1"`, "AverageStars", "belongs in rating", "3 judged")
+	r.MustPass(t).MustSay(t, `"rule":"intent-drift@2"`, "AverageStars", "belongs in rating", "3 judged")
 	if strings.Contains(r.Stdout, "AddLine") {
 		t.Error("a declaration that belongs must not become a finding")
 	}
@@ -78,6 +78,6 @@ func TestCasesAndVerifyRoundTrip(t *testing.T) {
 		`{"file":"internal/cart/cart.go","line":3,"name":"AverageStars","in":"cart","belongs":false,"layer":"rating","reason":"averages ratings","citation":"Ratings belong to the rating layer."}`+"\n"+
 			`{"file":"internal/rating/rating.go","line":3,"name":"Rating","in":"rating","belongs":true}`+"\n")
 	bin.Run(t, dir, "verify", ".", "--answers", "answers.jsonl", "--model", "skill", "--emit", "findings").
-		MustPass(t).MustSay(t, `"rule":"intent-drift@1"`, `"tool":"judge/external/skill"`, "AverageStars", "2 judged")
+		MustPass(t).MustSay(t, `"rule":"intent-drift@2"`, `"tool":"judge/external/skill"`, "AverageStars", "2 judged")
 	bin.Run(t, dir, "verify", ".").MustFail(t).MustSay(t, "--answers")
 }
